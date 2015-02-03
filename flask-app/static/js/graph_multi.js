@@ -132,7 +132,14 @@ $(function () {
                                                          url: '/update_chart/month/' + county_code + "/",
                                                          success: function(data) {
                                                             var monthly_meetups = new Highcharts.Chart({
-                                                                chart: {renderTo: 'monthly_meetups', type: 'line'},
+                                                                chart: {renderTo: 'monthly_meetups', 
+                                                                        type: 'line',
+                                                                        zoomType: 'x',
+                                                                        resetZoomButton: { position: { x: 0,
+                                                                                                       y: -30
+                                                                                                     }
+                                                                                         }
+                                                                       },
                                                                 title: {"text": "Meetups in " + data.county + ", " + data.state + " each month"},
                                                                 xAxis: {"type": 'datetime', "title": {"text": 'Date'}},
                                                                 yAxis: {"title": {"text": '# of Meetups'}, "min": 0},

@@ -60,66 +60,17 @@ def update_messages(county_code):
     county = county_state[0]
     state = county_state[1]
 
-    messages_rt = session.execute("SELECT * FROM by_county_rt_msgs WHERE state = '" + state + "' AND county = '" + county + "'")
-    stripped_msgs = messages_rt[0].messages.replace("JObject","").replace("JInt","").replace("JString","").replace("JArray","").replace("(","").replace(")","").replace("List","")
+    messages_rt = session.execute("SELECT * FROM by_couny_msgs WHERE state = '" + state + "' AND county = '" + county + "'")
 
-    messages = [keyval.strip() for keyval in stripped_msgs.split(",")]
-    messages = map(lambda x: str(x), messages)
-    message_list = []
-    curr_message = ""
-    creatorID_flag = False
-    timestamp_flag = False
-    timestamp_cnt = 0
-    time_str = ""
-    message_flag = False
-    for elem in messages:
+    if len(messages_rt)>=5:
+        recent_messages = messages_rt[-5:-1]
+        recent_messages.reverse()
+    else:
+        messages_rt.reverse()
+        recent_messages = messages_rt
 
-        if creatorID_flag:
-            curr_message += elem + ": "
-            creatorID_flag = False
-        elif timestamp_flag:
-            if timestamp_cnt == 0:
-                time_str = elem
-            elif timestamp_cnt <= 2:
-                if len(elem)<2:
-                    elem = "0" + elem
-                time_str += "/" + elem
-            elif timestamp_cnt == 3:
-                if len(elem)<2:
-                    elem = "0" + elem
-                time_str += " " + elem + ":"
-            elif timestamp_cnt == 4:
-                if len(elem)<2:
-                    elem = "0" + elem
-                time_str += elem + ":"
-            elif timestamp_cnt == 5:
-                if len(elem)<2:
-                    elem = "0" + elem
-                time_str += elem
+    message_list = map(parse_jobject_string_to_message, recent_messages)
 
-            timestamp_cnt += 1
-            if timestamp_cnt == 6:
-                curr_message = time_str + " " + curr_message
-                timestamp_flag = False
-                timestamp_cnt = 0
-                time_str = ""
-        elif message_flag:
-            curr_message += elem
-            message_list.append(curr_message)
-            curr_message = ""
-            message_flag = False
-
-        if elem == "creatorID":
-            creatorID_flag = True
-        elif elem == "timestamp":
-            timestamp_flag = True
-        elif elem == "message":
-            message_flag = True
-
-
-
-
-    message_list = message_list
     return jsonify(msg=message_list, county=county, state=state)
 
 
@@ -175,6 +126,25 @@ def update_chart(interval, county_code):
         historical_data.append([date_to_milli((year, month, day, hour, 0, 0, 0, 0, 0)), row.count])
 
     return jsonify(state=state, county=county, historical_data=historical_data)
+
+
+def parse_jobject_string_to_message(jobj):
+    stripped_msgs = jobj.message.replace("JObject","").replace("JInt","").replace("JString","").replace("JArray","").replace("(","").replace(")","").replace("List","")
+
+    message_list = [keyval.strip() for keyval in stripped_msgs.split(",")]
+    message_list = map(lambda x: str(x), message_list)
+
+    county = message_list[1]
+    state = message_list[3]
+    creatorID = message_list[5]
+    messageID = message_list[7]
+    timestamp = message_list[10] + '/' + message_list[11] + '/' + message_list[9] + ' ' + message_list[12] + ':' + message_list[13] + ':' + message_list[14]
+    message = message_list[16]
+    senderID = message_list[18]
+    rank = message_list[20]
+    return "{} {}: {}".format(timestamp, creatorID, message)
+
+
 
 
 if __name__ == '__main__':

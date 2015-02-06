@@ -69,7 +69,8 @@ def update_messages(county_code):
 
     fetch_time_from = "%02d" % curr_time.hour + "%02d" % curr_time.minute + "%02d" % max(curr_time.second-5, 0)
 
-
+    print fetch_time_to
+    print fetch_time_from
     messages_rt = session.execute("SELECT * FROM by_couny_msgs WHERE state='" + state +
                                                               "' AND county='" + county +
                                                               "' AND date=" + fetch_date +

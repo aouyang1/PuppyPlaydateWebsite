@@ -77,6 +77,7 @@ def update_messages(county_code):
                                                               " AND time>" + fetch_time_from +
                                                               " AND time<=" + fetch_time_to)
 
+    print messages_rt
     if len(messages_rt)>=5:
         recent_messages = messages_rt[-5:-1]
         recent_messages.reverse()

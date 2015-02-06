@@ -72,9 +72,9 @@ def update_messages(county_code):
 
     messages_rt = session.execute("SELECT * FROM by_couny_msgs WHERE state='" + state +
                                                               "' AND county='" + county +
-                                                              "' AND date='" + fetch_date +
-                                                              "' AND time>" + fetch_time_from +
-                                                              "' AND time<=" + fetch_time_to)
+                                                              "' AND date=" + fetch_date +
+                                                              " AND time>" + fetch_time_from +
+                                                              " AND time<=" + fetch_time_to)
 
     if len(messages_rt)>=5:
         recent_messages = messages_rt[-5:-1]

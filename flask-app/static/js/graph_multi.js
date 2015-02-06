@@ -109,12 +109,15 @@ $(function () {
                                                          url: '/new_messages/' + county_code + "/",
                                                          success: function(data) {
                                                             msg_len = data.msg.length
+                                                            console.log(msg_len)
                                                             document.getElementById("news_feed_title").innerHTML = "Current Messages in " + data.county + ", " + data.state;
-                                                            for (i = 0; i < msg_len; i++) {
+                                                            for (i = 0; i < 5; i++) {
+                                                                console.log(data.msg[i])
+                                                                console.log("----------------")
                                                                 if (i < msg_len) {
                                                                     document.getElementById("message" + (i+1).toString()).innerHTML = data.msg[i];
                                                                 }else{
-                                                                    document.getElementById("message" + (i+1).toString()).innerHTML = "";
+                                                                    document.getElementById("message" + (i+1).toString()).innerHTML = " ";
                                                                 }
                                                             }
                                                          }

@@ -62,22 +62,18 @@ def update_messages(county_code):
     county = county_state[0]
     state = county_state[1]
 
-    curr_time = datetime.now()
+    curr_time = datetime.utcnow()
 
     fetch_date = str(curr_time.year) + "%02d" % curr_time.month + "%02d" % curr_time.day
     fetch_time_to = "%02d" % curr_time.hour + "%02d" % curr_time.minute + "%02d" % curr_time.second
 
     fetch_time_from = "%02d" % curr_time.hour + "%02d" % curr_time.minute + "%02d" % max(curr_time.second-5, 0)
 
-    print fetch_date
-    print fetch_time_from
-    print fetch_time_to
+    query = "SELECT * FROM by_couny_msgs WHERE state='{}' AND county='{}' AND date={} AND time>{} AND time<={} ALLOW FILTERING;".format(state, county, fetch_date, fetch_time_from, fetch_time_to)
 
-    query = "SELECT * FROM by_couny_msgs WHERE state='{}' AND county='{}' AND date={} AND time>{} AND time<={};".format(state, county, fetch_date, fetch_time_from, fetch_time_to)
-    print query
     messages_rt = session.execute(query)
                                        
-    print messages_rt
+    print len(messages_rt)
     if len(messages_rt)>=5:
         recent_messages = messages_rt[-5:-1]
         recent_messages.reverse()
@@ -86,7 +82,8 @@ def update_messages(county_code):
         recent_messages = messages_rt
 
     message_list = map(parse_jobject_string_to_message, recent_messages)
-
+    for msg in message_list:
+        print msg
     return jsonify(msg=message_list, county=county, state=state)
 
 

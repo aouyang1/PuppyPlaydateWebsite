@@ -4,6 +4,7 @@ from flask import Flask, render_template, redirect, url_for, request, jsonify, j
 from cassandra.cluster import Cluster
 import csv
 import time
+from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 import time
@@ -33,6 +34,7 @@ def main_page():
     county = "Denton County"
     state = "TX"
 
+
     county_month = session.execute("SELECT * FROM by_county_month WHERE state = '" + state + "' AND county = '" + county + "'")
 
     def date_to_milli(time_tuple):
@@ -60,7 +62,19 @@ def update_messages(county_code):
     county = county_state[0]
     state = county_state[1]
 
-    messages_rt = session.execute("SELECT * FROM by_couny_msgs WHERE state = '" + state + "' AND county = '" + county + "'")
+    curr_time = datetime.now()
+
+    fetch_date = str(curr_time.year) + "%02d" % curr_time.month + "%02d" % curr_time.day
+    fetch_time_to = "%02d" % curr_time.hour + "%02d" % curr_time.minute + "%02d" % curr_time.second
+
+    fetch_time_from = "%02d" % curr_time.hour + "%02d" % curr_time.minute + "%02d" % max(curr_time.second-5, 0)
+
+
+    messages_rt = session.execute("SELECT * FROM by_couny_msgs WHERE state='" + state +
+                                                              "' AND county='" + county +
+                                                              "' AND date='" + fetch_date +
+                                                              "' AND time>" + fetch_time_from +
+                                                              "' AND time<=" + fetch_time_to)
 
     if len(messages_rt)>=5:
         recent_messages = messages_rt[-5:-1]

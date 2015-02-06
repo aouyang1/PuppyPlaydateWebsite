@@ -152,7 +152,7 @@ $(function () {
                                                                                                  success: function(data_sel) {
                                                                                                     console.log("plotting monthly")
                                                                                                     chart_series.setData(data_sel.historical_data)
-												    curr_chart.setTitle({"text": "Messages in " + county + ", " + state + " each month"})
+												    curr_chart.setTitle({"text": "Messages in " + data_sel.county + ", " + data_sel.state + " each month"})
                                                                                                  }
                                                                                                })
                                                                                         }
@@ -167,7 +167,7 @@ $(function () {
                                                                                                  success: function(data_sel) {
                                                                                                     console.log("plotting daily")
                                                                                                     chart_series.setData(data_sel.historical_data)
-												    curr_chart.setTitle({"text": "Messages in " + county + ", " + state + " each day"})
+												    curr_chart.setTitle({"text": "Messages in " + data_sel.county + ", " + data_sel.state + " each day"})
                                                                                                  }
                                                                                                })
                                                                                         }

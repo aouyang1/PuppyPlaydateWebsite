@@ -53,7 +53,7 @@ def main_page():
 
 @app.route('/new_messages/<county_code>/')
 def update_messages(county_code):
-    # query cassandra for top 10 recent messages from a county
+    # query cassandra for top 5 recent messages from a county
     # format into "timestamp user: message"
 
     county = code_county_dict[county_code]
@@ -67,15 +67,24 @@ def update_messages(county_code):
     fetch_date = str(curr_time.year) + "%02d" % curr_time.month + "%02d" % curr_time.day
     fetch_time_to = "%02d" % curr_time.hour + "%02d" % curr_time.minute + "%02d" % curr_time.second
 
-    fetch_time_from = "%02d" % curr_time.hour + "%02d" % curr_time.minute + "%02d" % max(curr_time.second-5, 0)
+    fetch_time_from = "%02d" % curr_time.hour + "%02d" % curr_time.minute + "%02d" % max(curr_time.second-30, 0)
 
-    query = "SELECT * FROM by_couny_msgs WHERE state='{}' AND county='{}' AND date={} AND time>{} AND time<={} ALLOW FILTERING;".format(state, county, fetch_date, fetch_time_from, fetch_time_to)
 
+    # Test access to by_couny_msgs table in Cassandra
+    blah = session.execute("SELECT * FROM by_couny_msgs WHERE state='{}' AND county='{}' LIMIT 5".format(state, county))
+    print blah
+
+
+    query = "SELECT * FROM by_couny_msgs WHERE state='{}' AND county='{}' AND date={} AND time>{} AND time<={}".format(state, county, fetch_date, fetch_time_from, fetch_time_to)
+
+    print session
     messages_rt = session.execute(query)
-                                       
+    print county_code, query                                       
     print len(messages_rt)
+
+    print blah
     if len(messages_rt)>=5:
-        recent_messages = messages_rt[-5:-1]
+        recent_messages = messages_rt[-6:-1]
         recent_messages.reverse()
     else:
         messages_rt.reverse()

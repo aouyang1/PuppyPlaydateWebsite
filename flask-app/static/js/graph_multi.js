@@ -136,7 +136,7 @@ $(function () {
 								       },
                                                                 title: {"text": "Messages in " + data.county + ", " + data.state + " each month"},
                                                                 xAxis: {"type": 'datetime', "title": {"text": 'Date'}},
-                                                                yAxis: {"title": {"text": '# of Meetups'}, "min": 0},
+                                                                yAxis: {"title": {"text": '# of Messages'}, "min": 0},
                                                                 series: [{"name": data.county + ", " + data.state, "data": data.historical_data}],
                                                                 exporting: {
                                                                  buttons: {

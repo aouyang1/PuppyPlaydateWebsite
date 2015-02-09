@@ -71,18 +71,16 @@ def update_messages(county_code):
 
 
     # Test access to by_couny_msgs table in Cassandra
-    blah = session.execute("SELECT * FROM by_couny_msgs WHERE state='{}' AND county='{}' LIMIT 5".format(state, county))
-    print blah
+    test_query = session.execute("SELECT * FROM by_couny_msgs WHERE state='{}' AND county='{}' LIMIT 5".format(state, county))
+    print test_query
 
 
     query = "SELECT * FROM by_couny_msgs WHERE state='{}' AND county='{}' AND date={} AND time>{} AND time<={}".format(state, county, fetch_date, fetch_time_from, fetch_time_to)
 
-    print session
     messages_rt = session.execute(query)
     print county_code, query                                       
-    print len(messages_rt)
+   
 
-    print blah
     if len(messages_rt)>=5:
         recent_messages = messages_rt[-6:-1]
         recent_messages.reverse()
@@ -99,7 +97,7 @@ def update_messages(county_code):
 @app.route('/update_map/')
 def update_map():
     county_rt = session.execute("SELECT * FROM by_county_rt")
-
+   
     # example format [{"code":"us-al-001","name":"Autauga County, AL","value":6.3},...]
 
     rt_data = []

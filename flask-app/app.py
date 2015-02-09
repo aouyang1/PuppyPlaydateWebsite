@@ -102,7 +102,11 @@ def update_map():
 
     rt_data = []
     for county in county_rt:
-        county_name_in_dict = "{}, {}".format(county.county, county.state)
+        if county.county == 'District of Columbia':
+	    county_name_in_dict = county.county
+	else:
+            county_name_in_dict = "{}, {}".format(county.county, county.state)
+
         county_code = county_code_dict[county_name_in_dict]
         rt_data.append({"code": county_code, "name": county_name_in_dict, "value": county.count})
 

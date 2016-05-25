@@ -10,7 +10,7 @@ import numpy as np
 import time
 
 app = Flask(__name__)
-cluster = Cluster(['54.215.184.69'])
+cluster = Cluster(['52.40.72.148'])
 session = cluster.connect('puppy')
 
 
@@ -31,24 +31,7 @@ code_county_dict = {code: name for name, code in county_code_dict.items()}
 @app.route('/')
 def main_page():
 
-    county = "Denton County"
-    state = "TX"
-
-
-    county_month = session.execute("SELECT * FROM by_county_month WHERE state = '" + state + "' AND county = '" + county + "'")
-
-    def date_to_milli(time_tuple):
-        epoch_sec = time.mktime((1970, 1, 1, 0, 0, 0, 0, 0, 0))
-        return 1000*int(time.mktime(time_tuple) - epoch_sec)
-
-    historical_data = []
-    for row in county_month:
-        curr_date = row.date
-        year = curr_date/100
-        month = curr_date - year*100
-        historical_data.append([date_to_milli((year, month, 0, 0, 0, 0, 0, 0, 0)), row.count])
-
-    return render_template('index.html', state=state, county=county, historical_data=historical_data)
+    return render_template('index.html')
 
 
 @app.route('/new_messages/<county_code>/')
@@ -113,44 +96,6 @@ def update_map():
     return jsonify(rt_data=rt_data)
 
 
-@app.route('/update_chart/<interval>/<county_code>/')
-def update_chart(interval, county_code):
-
-    county = code_county_dict[county_code]
-    county_state = [county_attr.strip() for county_attr in county.split(",")]
-
-    county = county_state[0]
-    state = county_state[1]
-
-    county_month = session.execute("SELECT * FROM by_county_" + interval + " WHERE state = '" + state + "' AND county = '" + county + "'")
-
-    def date_to_milli(time_tuple):
-        epoch_sec = time.mktime((1970, 1, 1, 0, 0, 0, 0, 0, 0))
-        return 1000*int(time.mktime(time_tuple) - epoch_sec)
-
-    historical_data = []
-    for row in county_month:
-        curr_date = row.date
-        if interval=="month":
-            year = curr_date/100
-            month = curr_date - year*100
-            day = 0
-            hour = 0
-        elif interval=="day":
-            year = curr_date/10000
-            month = (curr_date - year*10000)/100
-            day = (curr_date - year*10000 - month*100)
-            hour = 0
-        elif interval=="hour":
-            year = curr_date/1000000
-            month = (curr_date - year*1000000)/10000
-            day = (curr_date - year*1000000 - month*10000)/100
-            hour = (curr_date - year*1000000 - month*10000 - day*100)
-
-        historical_data.append([date_to_milli((year, month, day, hour, 0, 0, 0, 0, 0)), row.count])
-
-    return jsonify(state=state, county=county, historical_data=historical_data)
-
 
 def parse_jobject_string_to_message(jobj):
     stripped_msgs = jobj.message.replace("JObject","").replace("JInt","").replace("JString","").replace("JArray","").replace("(","").replace(")","").replace("List","")
@@ -172,4 +117,4 @@ def parse_jobject_string_to_message(jobj):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=80)
